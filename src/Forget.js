@@ -32,7 +32,8 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         paddingTop: 200,
-        paddingHorizontal: 20
+        paddingHorizontal: 20,
+        backgroundColor: '#FFFFFF'
     },
     head: {
         fontSize: 26,

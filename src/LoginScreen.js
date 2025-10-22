@@ -54,7 +54,7 @@ export default function LoginScreen({navigation}) {
         secureTextEntry
       />
 
-      <TouchableOpacity style={styles.signInButton}>
+      <TouchableOpacity style={styles.signInButton} onPress={() => navigation.navigate('home')}>
         <Text style={styles.signInText}>Sign In</Text>
       </TouchableOpacity>
 
@@ -65,7 +65,7 @@ export default function LoginScreen({navigation}) {
       <View style={styles.signUpContainer}>
         <Text style={styles.dont}>Don’t have an account? </Text>
         <TouchableOpacity onPress={() => navigation.navigate('signin')}>
-          <Text style={styles.signUpText}>SignIn</Text>
+          <Text style={styles.signUpText}>SignUp</Text>
         </TouchableOpacity>
       </View>
 
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 40,
     paddingBottom: 40,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
   },
   logo: {

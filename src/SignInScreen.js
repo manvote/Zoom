@@ -1,10 +1,57 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import axios from 'axios';
 
 export default function LoginScreen({navigation}) {
+
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [signUpSuccess, setSignUpSuccess] = useState(false);
+
+  const handleSignUp = async () => {
+    if (!name || !email || !password) {
+      setError('All fields are required');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await axios.post('http://10.0.2.2:8080/api/signup', {
+        name,
+        email,
+        password,
+      });
+
+      if (response.status === 200) {
+        // Successfully signed up, set state
+        setSignUpSuccess(true);
+      }
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+      // Handle error response from the server
+      if (err.response) {
+        // Server-side errors (e.g., email already exists)
+        setError(err.response.data || 'Sign-up failed. Please try again.');
+      } else {
+        setError('Network error. Please check your connection and try again.');
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (signUpSuccess) {
+      Alert.alert('Success', 'You have successfully signed up!', [
+        { text: 'OK', onPress: () => navigation.navigate('otp',  { email: email }) }
+      ]);
+    }
+  }, [signUpSuccess]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -17,9 +64,9 @@ export default function LoginScreen({navigation}) {
 
       <TextInput
         style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
+        value={name}
+        onChangeText={setName}
+        keyboardType="name"
         autoCapitalize="none"
       />
 
@@ -40,8 +87,15 @@ export default function LoginScreen({navigation}) {
         secureTextEntry
       />
 
-      <TouchableOpacity style={styles.signInButton}>
-        <Text style={styles.signInText}>Sign In</Text>
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+
+      <TouchableOpacity
+        style={styles.signInButton}
+        onPress={handleSignUp}
+        disabled={loading}
+      >
+        <Text style={styles.signInText}>{loading ? 'Signing Up...' : 'Sign Up'}</Text>
       </TouchableOpacity>
 
       <View style={styles.signUpContainer}>
@@ -58,17 +112,17 @@ export default function LoginScreen({navigation}) {
       </View>
 
       <TouchableOpacity style={styles.socialButton}>
-        <Image 
-            source={require('./assets/download.png')}
-            style={styles.icon1} 
+        <Image
+          source={require('./assets/download.png')}
+          style={styles.icon1}
         />
         <Text style={styles.socialText}>Sign in with an account</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.socialButton}>
-        <Image 
-          source={require('./assets/images.png')} 
-          style={styles.icon2} 
+        <Image
+          source={require('./assets/images.png')}
+          style={styles.icon2}
           resizeMode="contain"
         />
         <Text style={styles.socialText}>Sign in with an account</Text>
@@ -146,6 +200,11 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: 'bold',
     marginTop: 10,
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 10,
+    textAlign: 'center',
   },
   input: {
     borderWidth: 1,
